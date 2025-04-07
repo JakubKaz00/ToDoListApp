@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="user-form-container">
+        <h1 class="title">➕ Dodaj Nowego Użytkownika</h1>
+
+        <form method="POST" action="{{ url_for('add_user') }}" class="user-form">
+            <div class="form-group">
+                <label for="first_name">👤 Imię</label>
+                <input type="text" id="first_name" name="first_name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="last_name">👤 Nazwisko</label>
+                <input type="text" id="last_name" name="last_name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="username">🔑 Nazwa użytkownika</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">🔒 Hasło</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+
+            <div class="form-group">
+                <label for="role">⚡ Rola</label>
+                <select id="role" name="role">
+                    <option value="user">Użytkownik</option>
+                    <option value="admin">Administrator</option>
+                </select>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="flash-message flash-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <button type="submit" class="btn-success">✅ Dodaj użytkownika</button>
+        </form>
+
+        <a href="{{ url_for('users') }}" class="btn-secondary">⬅ Powrót do panelu użytkowników</a>
+    </div>
+
+    <style>
+        .user-form-container {
+            max-width: 500px;
+            margin: auto;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+        .btn-success, .btn-secondary {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #218838;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        .flash-messages {
+        margin-bottom: 20px;
+        }
+        .flash-message {
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .flash-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        .flash-success {
+            background-color: #28a745;
+            color: white;
+        }
+    </style>
+{% endblock %}

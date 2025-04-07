@@ -1,0 +1,19 @@
+version: '3.8'
+services:
+  ecommerce-product-db:
+    image: postgres:15
+    container_name: todo-db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=admin123
+      - POSTGRES_DB=todo-db
+    ports:
+      - '5470:5432'
+    networks:
+      - todo-db-network
+    volumes:
+      - ./attachments:/app/attachments
+
+networks:
+  todo-db-network:
+    driver: bridge

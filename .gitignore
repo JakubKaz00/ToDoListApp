@@ -1,0 +1,6 @@
+static/attachments/
+.venv
+.idea
+attachments
+__pycache__/
+enums/__pycache__/

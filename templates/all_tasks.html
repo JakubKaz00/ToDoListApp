@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1 class="page-title">Wszystkie zadania</h1>
+
+    <div class="task-title-list-container">
+        {% set status_order = ["DONE", "READY_FOR_DEMO", "BLOCKED_WAITING", "TO_BE_TESTED", "IN_REVIEW", "IN_PROGRESS", "TODO"] %}
+
+    {% for status in status_order %}
+        {% set tasks_for_status = tasks | selectattr('status', 'equalto', status) | list %}
+        {% if tasks_for_status %}
+            <h2 class="task-status-header">{{ status.replace("_", " ") }}</h2>
+            <div class="task-list-container">
+                {% for task in tasks_for_status %}
+                    {% if not task.is_deleted %}
+                        <div class="task-card">
+                            <div class="task-header">
+                                <a href="{{ url_for('task_details', task_id=task.id) }}" class="task-title">{{ task.title }}</a>
+                                <span class="task-priority badge">
+                                    {% if task.priority == 1 %}
+                                        Wysoki
+                                    {% elif task.priority == 2 %}
+                                        Średni
+                                    {% else %}
+                                        Niski
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <div class="task-deadline">
+                                <strong>Termin:</strong>
+                                {% if task.deadline %}
+                                    {{ task.deadline.strftime('%Y-%m-%d') }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </div>
+                            <div class="task-user">
+                                <strong>Użytkownik:</strong> {{ task.user.first_name + " " + task.user.last_name }}
+                            </div>
+                            <div class="task-actions">
+                                <a href="#" onclick="confirmDeletion('{{ url_for('delete_task', task_id=task.id) }}')" class="delete-button">
+                                    <span>❌</span> Usuń
+                                </a>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endfor %}
+    </div>
+
+    <script>
+        function showDeleteAnimation(callback) {
+            const deleted = document.createElement('div');
+            deleted.innerText = "🗑 Zadanie zostało usunięte!";
+            deleted.style.position = 'fixed';
+            deleted.style.top = '50%';
+            deleted.style.left = '50%';
+            deleted.style.transform = 'translate(-50%, -50%)';
+            deleted.style.background = '#f44336';
+            deleted.style.color = 'white';
+            deleted.style.padding = '20px 40px';
+            deleted.style.fontSize = '1.2rem';
+            deleted.style.borderRadius = '10px';
+            deleted.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+            deleted.style.zIndex = '1000';
+            deleted.style.opacity = '0';
+            deleted.style.transition = 'opacity 0.4s ease-in-out';
+
+            document.body.appendChild(deleted);
+
+            setTimeout(() => {
+                deleted.style.opacity = '1';
+            }, 10);
+
+            setTimeout(() => {
+                deleted.style.opacity = '0';
+                setTimeout(() => {
+                    document.body.removeChild(deleted);
+                    if (typeof callback === 'function') callback();
+                }, 400);
+            }, 500);
+        }
+
+        function confirmDeletion(url) {
+            const confirmed = confirm("Czy na pewno chcesz usunąć to zadanie? Tej czynności nie można cofnąć.");
+            if (confirmed) {
+                showDeleteAnimation(() => {
+                    window.location.href = url;
+                });
+            }
+        }
+    </script>
+
+    <style>
+        .page-title {
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+
+        .task-status-header {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin: 20px 0 10px;
+            color: #333;
+            text-transform: uppercase;
+            width: 100% !important;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .task-title-list-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .task-list-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            padding: 0 20px;
+        }
+
+        .task-card {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            transition: transform 0.3s ease-in-out;
+            overflow: hidden;
+        }
+
+        .task-card:hover {
+            transform: scale(1.05);
+        }
+
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .task-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .task-title:hover {
+            text-decoration: underline;
+        }
+
+        .badge {
+            background-color: #007bff;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            text-transform: capitalize;
+        }
+
+        .task-deadline, .task-user {
+            margin-top: 10px;
+            font-size: 1rem;
+            color: #555;
+        }
+
+        .task-actions {
+            margin-top: 20px;
+            text-align: right;
+        }
+
+        .delete-button {
+            font-size: 1rem;
+            color: #f44336;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .delete-button:hover {
+            text-decoration: underline;
+        }
+
+        .delete-animation {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #f44336;
+            color: white;
+            padding: 20px 40px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            opacity: 0;
+            transition: opacity 0.4s ease-in-out;
+            z-index: 1000;
+        }
+    </style>
+{% endblock %}

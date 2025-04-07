@@ -1,0 +1,10 @@
+import enum
+
+class TaskStatus(enum.Enum):
+    TODO = "TODO"
+    IN_PROGRESS = "IN_PROGRESS"
+    IN_REVIEW = "IN_REVIEW"
+    TO_BE_TESTED = "TO_BE_TESTED"
+    BLOCKED_WAITING = "BLOCKED_WAITING"
+    READY_FOR_DEMO = "READY_FOR_DEMO"
+    DONE = "DONE"

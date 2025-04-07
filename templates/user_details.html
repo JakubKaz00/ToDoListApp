@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="user-details-container">
+        <h1 class="user-details-title">👤 Twoje konto</h1>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash-message {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <div class="user-details-info">
+            <p><strong>Imię:</strong> {{ user.first_name }}</p>
+            <p><strong>Nazwisko:</strong> {{ user.last_name }}</p>
+            <p><strong>Użytkownik:</strong> {{ user.username }}</p>
+            <p><strong>Rola:</strong> {{ 'Admin' if user.role == 'admin' else 'Użytkownik' }}</p>
+        </div>
+
+        <h2>🔑 Zmień hasło</h2>
+        <br />
+        <form method="POST" action="{{ url_for('reset_password_self') }}" class="reset-password-form" onsubmit="return validatePasswords()">
+            <div class="form-group">
+                <label for="old_password">Stare hasło:</label>
+                <input type="password" id="old_password" name="old_password" required>
+            </div>
+
+            <div class="form-group">
+                <label for="new_password">Nowe hasło:</label>
+                <input type="password" id="new_password" name="new_password" required>
+            </div>
+
+            <div class="form-group">
+                <label for="confirm_password">Potwierdź nowe hasło:</label>
+                <input type="password" id="confirm_password" name="confirm_password" required>
+            </div>
+
+            <button type="submit" class="btn-reset-password">🔄 Zmień hasło</button>
+        </form>
+
+        <a href="{{ url_for('index') }}" class="btn-back">🔙 Wróć do strony głównej</a>
+    </div>
+
+    <script>
+        function validatePasswords() {
+            let newPassword = document.getElementById("new_password").value;
+            let confirmPassword = document.getElementById("confirm_password").value;
+
+            if (newPassword !== confirmPassword) {
+                alert("Błąd: Nowe hasła nie są identyczne!");
+                return false;
+            }
+
+            if (newPassword.length < 8) {
+                alert("Błąd: Nowe hasło musi mieć co najmniej 8 znaków!");
+                return false;
+            }
+
+            return true;
+        }
+    </script>
+
+    <style>
+        .flash-messages {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .flash-message {
+            padding: 10px;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        .success {
+            background: #28a745;
+            color: white;
+        }
+
+        .danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .user-details-container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-details-title {
+            text-align: center;
+            font-size: 26px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .user-details-info {
+            margin-bottom: 20px;
+        }
+
+        .user-details-info p {
+            font-size: 1.2rem;
+            margin: 8px 0;
+        }
+
+        .reset-password-form {
+            max-width: 400px;
+            margin: auto;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            font-weight: bold;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .btn-reset-password {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background: #28a745;
+            color: white;
+            font-size: 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .btn-reset-password:hover {
+            background: #218838;
+        }
+
+        .btn-back {
+            display: block;
+            width: fit-content;
+            margin: 15px auto;
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 8px;
+            transition: background 0.3s ease;
+        }
+
+        .btn-back:hover {
+            background: #0056b3;
+        }
+    </style>
+{% endblock %}

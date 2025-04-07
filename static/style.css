@@ -1,0 +1,65 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+}
+
+.appbar {
+    background-color: #333;
+    color: white;
+    padding: 10px;
+}
+
+.appbar .container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.appbar a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.container {
+    width: 50%;
+    margin: auto;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    padding: 10px;
+    margin: 5px;
+    background: lightgray;
+}
+
+.done {
+    text-decoration: line-through;
+    color: gray;
+}
+
+.task-title {
+    font-weight: bold;
+}
+
+.task-deadline {
+    color: #007bff;
+}
+
+.task-priority {
+    font-style: italic;
+    color: #ff7f50;
+}
+
+form {
+    margin-bottom: 20px;
+}
+
+form input, form select {
+    padding: 5px;
+    margin: 5px;
+}

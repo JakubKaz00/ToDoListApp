@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Lista Zadań</h1>
+
+    <form method="POST" action="{{ url_for('add_task') }}">
+        <input type="text" name="title" placeholder="Nowe zadanie" required>
+        <input type="date" name="deadline" placeholder="Deadline">
+        <select name="priority">
+            <option value="1">Wysoki</option>
+            <option value="2">Średni</option>
+            <option value="3" selected>Niski</option>
+        </select>
+        <button type="submit">Dodaj</button>
+    </form>
+
+    <h2>Filtruj zadania</h2>
+    <form method="GET" action="{{ url_for('index') }}">
+        <label for="priority">Priorytet:</label>
+        <select name="priority">
+            <option value="">Wybierz priorytet</option>
+            <option value="1">Wysoki</option>
+            <option value="2">Średni</option>
+            <option value="3">Niski</option>
+        </select>
+
+        <label for="deadline">Deadline:</label>
+        <input type="date" name="deadline">
+
+        <button type="submit">Filtruj</button>
+    </form>
+
+    <ul>
+        {% for task in tasks %}
+            <li class="{% if task.completed %}done{% endif %}">
+                <span class="task-title">{{ task.title }}</span>
+                {% if task.deadline %}
+                    <span class="task-deadline">Deadline: {{ task.deadline.strftime('%Y-%m-%d') }}</span>
+                {% endif %}
+                <span class="task-priority">Priorytet: {{ task.priority }}</span>
+                <a href="{{ url_for('complete_task', task_id=task.id) }}">✔</a>
+                <a href="{{ url_for('delete_task', task_id=task.id) }}">❌</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

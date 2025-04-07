@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <div class="appbar" id="appbar">
+        <div class="container">
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('tasks') }}" class="nav-item">Twoje zadania</a>
+            {% endif %}
+
+            {% if current_user.is_authenticated and current_user.is_admin() %}
+                <a href="{{ url_for('all_tasks') }}" class="nav-item">Wszystkie zadania</a>
+            {% endif %}
+
+            {% if current_user.is_authenticated and current_user.is_admin() %}
+                <a href="{{ url_for('add_task') }}" class="nav-item">Dodaj zadanie</a>
+            {% endif %}
+
+            {% if current_user.is_authenticated and current_user.is_admin() %}
+                <a href="{{ url_for('users') }}" class="nav-item">Użytkownicy</a>
+            {% endif %}
+
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('user_details') }}" class="nav-item">Konto</a>
+            {% endif %}
+
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('logout') }}" class="nav-item">Wyloguj</a>
+            {% endif %}
+
+            {% if not current_user.is_authenticated %}
+                <label class="welcome-label">Witamy w Todo List App!</label>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="container">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+</body>
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f8f8f8;
+    transition: background-color 0.3s ease;
+}
+
+.appbar {
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 0px 0;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+    z-index: 1000;
+}
+
+.appbar.scrolled {
+    background: rgba(0, 0, 0, 1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.appbar .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.nav-item {
+    color: white;
+    text-decoration: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.nav-item:hover {
+    background-color: #575757;
+    border-radius: 4px;
+    transform: scale(1.1);
+}
+
+.welcome-label {
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.appbar.scrolled .nav-item {
+    color: #f8f8f8;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    transition: padding 0.3s ease;
+}
+
+@keyframes appbarSlideIn {
+    from {
+        transform: translateY(-100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+body {
+    padding-top: 80px;
+}
+
+@media (max-width: 768px) {
+    .appbar .container {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .nav-item {
+        padding: 8px 15px;
+        font-size: 14px;
+    }
+
+    .welcome-label {
+        font-size: 16px;
+    }
+}
+
+</style>
+
+<script>
+window.addEventListener('scroll', function() {
+    const appbar = document.getElementById('appbar');
+    if (window.scrollY > 50) {
+        appbar.classList.add('scrolled');
+    } else {
+        appbar.classList.remove('scrolled');
+    }
+});
+</script>
+
+</html>

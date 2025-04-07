@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Twoje zadania</h1>
+<br/>
+
+<style>
+  .board {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    margin-bottom: 2rem;
+  }
+
+  .column {
+    flex: 1 1 calc(100% / 7);
+    min-width: 180px;
+    box-sizing: border-box;
+    margin: 5px;
+    background-color: #f4f5f7;
+    border-radius: 8px;
+    padding: 10px;
+    min-height: 400px;
+    overflow-y: auto;
+  }
+
+  .column[data-status="TODO"]           { background-color: #dfe1e6; }
+  .column[data-status="IN_PROGRESS"]    { background-color: #e1f0ff; }
+  .column[data-status="IN_REVIEW"]      { background-color: #fff2cc; }
+  .column[data-status="TO_BE_TESTED"]   { background-color: #ffebe6; }
+  .column[data-status="BLOCKED_WAITING"]{ background-color: #fddede; }
+  .column[data-status="READY_FOR_DEMO"] { background-color: #e3fcef; }
+  .column[data-status="DONE"]           { background-color: #d3f9d8; }
+
+  .column h3 {
+    text-align: center;
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+    font-weight: bold;
+  }
+
+  .task-card {
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 6px;
+    cursor: grab;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease;
+  }
+
+  .task-card:hover {
+    transform: scale(1.02);
+  }
+
+  .task-card small {
+    display: block;
+    font-size: 0.8rem;
+    color: #666;
+  }
+
+  .task-card a {
+    margin-right: 8px;
+    text-decoration: none;
+  }
+
+  .task-card a:hover {
+    text-decoration: underline;
+  }
+
+  .completed-task {
+    background-color: #e0e0e0;
+    color: #999;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  @media (max-width: 1200px) {
+    .column {
+      flex: 1 1 calc(100% / 3);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .column {
+      flex: 1 1 100%;
+    }
+  }
+</style>
+
+<div class="board">
+  {% for status in ['TODO', 'IN_PROGRESS', 'IN_REVIEW', 'TO_BE_TESTED', 'BLOCKED_WAITING', 'READY_FOR_DEMO', 'DONE'] %}
+    <div class="column" data-status="{{ status }}" ondrop="drop(event)" ondragover="allowDrop(event)">
+      <h3>{{ status.replace('_', ' ') }}</h3>
+      {% for task in tasks if task.status == status %}
+        <div class="task-card {% if task.completed %}completed-task{% endif %}"
+             {% if task.completed %}style="pointer-events: none;"{% endif %}
+             draggable="{% if not task.completed %}true{% else %}false{% endif %}"
+             ondragstart="drag(event)"
+             data-task-id="{{ task.id }}"
+             id="task-{{ task.id }}"
+             ondblclick="openTaskDetails('{{ url_for('task_details', task_id=task.id) }}')">
+          <strong>{{ task.title }}</strong><br>
+          {% if task.deadline %}
+            <small>Deadline: {{ task.deadline.strftime('%Y-%m-%d') }}</small>
+          {% else %}
+            <small>Deadline: ∞</small>
+          {% endif %}
+          <small>Priorytet: {{ task.priority }}</small>
+          {% if task.status == 'DONE' %}
+            <div style="margin-top: 5px;">
+              <a href="#" onclick="confirmCompletion('{{ url_for('complete_task', task_id=task.id) }}')">✔</a>
+            </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  {% endfor %}
+</div>
+
+<script>
+  let draggedTaskId = null;
+
+  function allowDrop(ev) {
+    ev.preventDefault();
+  }
+
+  function drag(ev) {
+    draggedTaskId = ev.target.dataset.taskId;
+  }
+
+  function drop(ev) {
+    ev.preventDefault();
+    const newStatus = ev.currentTarget.dataset.status;
+
+    fetch(`/tasks/${draggedTaskId}/status`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: `status=${newStatus}`
+    }).then(response => {
+      if (response.ok) {
+        location.reload();
+      } else {
+        alert("Nie udało się zmienić statusu.");
+      }
+    });
+  }
+
+  function showCongratsAnimation(callback) {
+    const congrats = document.createElement('div');
+    congrats.innerText = "🎉 Gratulacje! Zadanie zostało ukończone!";
+    congrats.style.position = 'fixed';
+    congrats.style.top = '50%';
+    congrats.style.left = '50%';
+    congrats.style.transform = 'translate(-50%, -50%)';
+    congrats.style.background = '#4caf50';
+    congrats.style.color = 'white';
+    congrats.style.padding = '20px 40px';
+    congrats.style.fontSize = '1.2rem';
+    congrats.style.borderRadius = '10px';
+    congrats.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+    congrats.style.zIndex = '1000';
+    congrats.style.opacity = '0';
+    congrats.style.transition = 'opacity 0.4s ease-in-out';
+
+    document.body.appendChild(congrats);
+
+    setTimeout(() => {
+      congrats.style.opacity = '1';
+    }, 10);
+
+    setTimeout(() => {
+      congrats.style.opacity = '0';
+      setTimeout(() => {
+        document.body.removeChild(congrats);
+        if (typeof callback === 'function') callback();
+      }, 400);
+    }, 500);
+  }
+
+  function confirmCompletion(url) {
+    const confirmed = confirm("Czy to zadanie na pewno jest ukończone? Tej czynności nie będzie można cofnąć.");
+    if (confirmed) {
+      showCongratsAnimation(() => {
+        window.location.href = url;
+      });
+    }
+  }
+
+  function openTaskDetails(url) {
+    window.location.href = url;
+  }
+</script>
+
+{% endblock %}
