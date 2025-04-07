@@ -1,4 +1,4 @@
-static/attachments/
+static/attachments/*
 .venv
 .idea
 attachments
