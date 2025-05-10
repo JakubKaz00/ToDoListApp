@@ -1,18 +1,5 @@
 version: '3.8'
-
 services:
-  flask-app:
-    build: .
-    container_name: flask-app
-    ports:
-      - '5000:5000'
-    environment:
-      - DATABASE_URL=postgresql://postgres:admin123@todo-db:5432/todo-db
-    depends_on:
-      - ecommerce-product-db
-    networks:
-      - todo-db-network
-
   ecommerce-product-db:
     image: postgres:15
     container_name: todo-db
